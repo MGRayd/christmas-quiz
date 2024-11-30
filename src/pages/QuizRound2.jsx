@@ -4,11 +4,11 @@ import { FaLock, FaLockOpen } from 'react-icons/fa';
 
 // Import all images
 const blankedImages = [...Array(10)].map((_, i) => 
-  import.meta.env.BASE_URL + `images/${i + 1}-Blanked.jpg`
+  `/xmas-quiz/images/${i + 1}-Blanked.jpg`
 );
 
 const originalImages = [...Array(10)].map((_, i) => 
-  import.meta.env.BASE_URL + `images/${i + 1}.jpg`
+  `/xmas-quiz/images/${i + 1}.jpg`
 );
 
 // Add a new CSS class for image transition

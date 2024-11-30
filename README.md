@@ -23,3 +23,6 @@ Visit the quiz at: https://mgrayd.github.io/xmas-quiz/
 - Tailwind CSS
 - Google Sheets API
 - GitHub Pages
+
+## Local Development
+1. Clone the repository:
