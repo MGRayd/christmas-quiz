@@ -1,0 +1,28 @@
+{
+  "name": "christmas-quiz",
+  "private": true,
+  "homepage": "https://mgrayd.github.io/xmas-quiz/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mgrayd/xmas-quiz.git"
+  },
+  "version": "0.0.0",
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.12"
+  },
+  "dependencies": {
+    "framer-motion": "^11.12.0",
+    "react-icons": "^5.3.0",
+    "react-router-dom": "^7.0.1",
+    "zustand": "^5.0.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
