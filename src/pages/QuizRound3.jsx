@@ -1,68 +1,71 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaLock, FaLockOpen, FaQuestionCircle } from 'react-icons/fa';
 
 const anagrams = [
-  {
+  { 
     id: 1,
-    scrambled: "CAROL GININS",
-    answer: "CAROL SINGING",
-    hint: "Musical festive activity"
+    text: "VANDAL DECANTER", 
+    hint: "A festive countdown to December 25th (6, 8)"
   },
-  {
+  { 
     id: 2,
-    scrambled: "WINTER HAMS",
-    answer: "WARM NIGHTS",
-    hint: "Cozy evening description"
+    text: "MERRIEST CHATS", 
+    hint: "Decorated with baubles and tinsel (9, 4)"
   },
-  {
+  { 
     id: 3,
-    scrambled: "TINY VITAL",
-    answer: "NATIVITY",
-    hint: "The Christmas story"
+    text: "SLIME TOTE", 
+    hint: "Hang it up for a Christmas kiss (9)"
   },
-  {
+  { 
     id: 4,
-    scrambled: "PRESENT",
-    answer: "SERPENT",
-    hint: "Something wrapped under the tree"
+    text: "DANCEY CANS", 
+    hint: "Sweet striped festive treats (5, 5)"
   },
-  {
+  { 
     id: 5,
-    scrambled: "FRUIT CAKES",
-    answer: "FRUIT CAKES",
-    hint: "Traditional Christmas dessert"
+    text: "SNOG STICK", 
+    hint: "Hang them by the fireplace for presents (10)"
   },
-  {
+  { 
     id: 6,
-    scrambled: "SLEIGH BELLS",
-    answer: "SLEIGH BELLS",
-    hint: "They ring on Santa's transport"
+    text: "ENCASES TART", 
+    hint: "Anonymous gift-giving tradition (6, 5)"
   },
-  {
+  { 
     id: 7,
-    scrambled: "SMILE TOTE",
-    answer: "MISTLETOE",
-    hint: "Kiss beneath it"
+    text: "DISARMS SCRATCH", 
+    hint: "Festive greetings in the mail (9, 5)"
   },
-  {
+  { 
     id: 8,
-    scrambled: "MATHS RISC",
-    answer: "CHRISTMAS",
-    hint: "The holiday itself"
+    text: "YETI DUEL", 
+    hint: "Traditional name for the Christmas season (8)"
   },
-  {
+  { 
     id: 9,
-    scrambled: "RIDE NEAR",
-    answer: "REINDEER",
-    hint: "Santa's helpers"
+    text: "SCRATCH ORALISMS", 
+    hint: "Songs of the season (9, 6)"
   },
-  {
+  { 
     id: 10,
-    scrambled: "WRAP PAPER",
-    answer: "WRAP PAPER",
-    hint: "Decorative covering"
+    text: "STARFISH REMATCH", 
+    hint: "The man in red himself (6, 9)"
   }
+];
+
+const encodedAnswers = [
+  "QWR2ZW50IENhbGVuZGFy",      // Advent Calendar
+  "Q2hyaXN0bWFzIFRyZWU=",      // Christmas Tree
+  "TWlzdGxldG9l",              // Mistletoe
+  "Q2FuZHkgQ2FuZXM=",          // Candy Canes
+  "U3RvY2tpbmdz",              // Stockings
+  "U2VjcmV0IFNhbnRh",          // Secret Santa
+  "Q2hyaXN0bWFzIENhcmRz",      // Christmas Cards
+  "WXVsZXRpZGU=",              // Yuletide
+  "Q2hyaXN0bWFzIENhcm9scw==",  // Christmas Carols
+  "RmF0aGVyIENocmlzdG1hcw=="   // Father Christmas
 ];
 
 // Add normalizeAnswer helper function
@@ -80,6 +83,7 @@ function QuizRound3() {
   const [lockedAnswers, setLockedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showHint, setShowHint] = useState({});
+  const [hintsUsed, setHintsUsed] = useState(0);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -111,11 +115,19 @@ function QuizRound3() {
     }));
   };
 
-  // Update calculateScore
+  const handleHint = (questionId) => {
+    if (hintsUsed < 3 && !showHint[questionId]) {
+      setShowHint(prev => ({ ...prev, [questionId]: true }));
+      setHintsUsed(prev => prev + 1);
+    }
+  };
+
+  // Update calculateScore function
   const calculateScore = () => {
     let correct = 0;
-    anagrams.forEach(q => {
-      if (normalizeAnswer(answers[q.id]) === normalizeAnswer(q.answer)) {
+    anagrams.forEach((q, index) => {
+      // Compare the normalized answer with the decoded correct answer
+      if (normalizeAnswer(answers[q.id]) === normalizeAnswer(atob(encodedAnswers[index]))) {
         correct++;
       }
     });
@@ -125,12 +137,16 @@ function QuizRound3() {
     };
   };
 
+  // Update handleSubmit to ensure we're saving the correct scores
   const handleSubmit = () => {
     if (Object.keys(lockedAnswers).length === anagrams.length) {
+      const score = calculateScore();
       setShowResults(true);
       localStorage.setItem('round3Answers', JSON.stringify(answers));
-      localStorage.setItem('round3Score', JSON.stringify(calculateScore()));
-      // Smooth scroll to top when showing results
+      localStorage.setItem('round3Score', JSON.stringify({
+        ...score,
+        hintsUsed
+      }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -143,20 +159,20 @@ function QuizRound3() {
     <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-8 px-4 sm:py-12">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
             Round 3: Christmas Anagrams! 🎄
           </h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            You have 3 hints available for this round - use them wisely! 🎯
+          </p>
 
           <div className="space-y-6">
             {anagrams.map((anagram) => (
-              <div 
-                key={anagram.id}
-                className="bg-gray-50 p-4 rounded-lg transform transition-all duration-500"
-              >
+              <div key={anagram.id} className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <div className="flex-1">
                     <p className="text-lg sm:text-xl font-bold text-gray-700 mb-2">
-                      {anagram.scrambled}
+                      {anagram.text}
                     </p>
                     <div className="flex items-center gap-2">
                       <input
@@ -165,41 +181,46 @@ function QuizRound3() {
                         onChange={(e) => handleAnswerChange(anagram.id, e.target.value)}
                         disabled={lockedAnswers[anagram.id] || showResults}
                         placeholder="Unscramble the letters..."
-                        className="flex-1 p-2 border rounded-lg text-sm sm:text-base"
+                        className="flex-1 p-2 border rounded-lg"
                       />
                       <button
                         onClick={() => toggleLock(anagram.id)}
-                        className={`p-2 rounded-lg transition-colors duration-300 ${
+                        className={`p-2 rounded-lg ${
                           lockedAnswers[anagram.id] 
-                            ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-green-100 text-green-600' 
+                            : 'bg-gray-100 text-gray-600'
                         }`}
                       >
                         {lockedAnswers[anagram.id] ? <FaLock /> : <FaLockOpen />}
                       </button>
-                      <button
-                        onClick={() => toggleHint(anagram.id)}
-                        className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200
-                                 transition-colors duration-300"
-                      >
-                        💡
-                      </button>
+                      {!showHint[anagram.id] && hintsUsed < 3 && !lockedAnswers[anagram.id] && (
+                        <button
+                          onClick={() => handleHint(anagram.id)}
+                          className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 
+                                     transition-colors duration-200 flex items-center gap-2"
+                          title={`Use Hint (${3 - hintsUsed} remaining)`}
+                        >
+                          <FaQuestionCircle className="text-lg" />
+                          <span className="hidden sm:inline">
+                            ({3 - hintsUsed})
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
                 {showHint[anagram.id] && (
-                  <p className="text-blue-600 mt-2 animate-fadeIn">
+                  <p className="text-blue-600 mt-2">
                     Hint: {anagram.hint}
                   </p>
                 )}
                 {showResults && (
                   <p className={`font-semibold ${
-                    normalizeAnswer(answers[anagram.id]) === normalizeAnswer(anagram.answer)
+                    normalizeAnswer(answers[anagram.id]) === normalizeAnswer(atob(encodedAnswers[anagram.id - 1]))
                       ? 'text-green-600'
                       : 'text-red-600'
-                    } animate-fadeIn`}
-                  >
-                    Correct Answer: {anagram.answer}
+                  }`}>
+                    Correct Answer: {atob(encodedAnswers[anagram.id - 1])}
                   </p>
                 )}
               </div>

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaLock, FaLockOpen, FaQuestionCircle } from 'react-icons/fa';
 
 const questions = [
   {
     id: 1,
-    emojis: "🏻😱🎄👦🏼👴🏼",
+    emojis: "😱🎄👦🏼👴🏼",
     answer: "HOME ALONE",
     hint: "Kid left behind during Christmas vacation"
   },
@@ -19,18 +19,22 @@ const questions = [
     id: 3,
     emojis: "🏠🎄😨✈️🗽",
     answer: "HOME ALONE 2: LOST IN NEW YORK",
+    alternativeAnswers: [
+      "HOME ALONE 2",
+      "HOME ALONE 2 LOST IN NEW YORK"
+    ],
     hint: "Kid gets on wrong plane at Christmas"
   },
   {
     id: 4,
-    emojis: "🎄📖👓😊",
+    emojis: "🎄📖",
     answer: "A CHRISTMAS STORY",
     hint: "Boy wants a Red Ryder BB gun"
   },
   {
     id: 5,
     emojis: "✈️🚂🚗👴🏼👨🏻",
-    answer: "PLANES, TRAINS AND AUTOMOBILES",
+    answer: "PLANES TRAINS AND AUTOMOBILES",
     hint: "Two men try to get home for the holidays"
   },
   {
@@ -41,7 +45,7 @@ const questions = [
   },
   {
     id: 7,
-    emojis: "👨‍♂️🎅🍝",
+    emojis: "👨‍♂️🎅🍬🍝",
     answer: "ELF",
     hint: "Will Ferrell as a human raised by Santa's helpers"
   },
@@ -55,6 +59,9 @@ const questions = [
     id: 9,
     emojis: "🎄🎅🚂👮",
     answer: "THE POLAR EXPRESS",
+    alternativeAnswers: [
+      "Polar Express"
+    ],
     hint: "Magical train ride to North Pole"
   },
   {
@@ -79,6 +86,7 @@ function QuizRound5() {
   const [lockedAnswers, setLockedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showHint, setShowHint] = useState({});
+  const [hintsUsed, setHintsUsed] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -112,8 +120,17 @@ function QuizRound5() {
   const calculateScore = () => {
     let correct = 0;
     questions.forEach(q => {
-      if (normalizeAnswer(answers[q.id]) === normalizeAnswer(q.answer)) {
+      const userAnswer = normalizeAnswer(answers[q.id]);
+      const correctAnswer = normalizeAnswer(q.answer);
+      
+      if (userAnswer === correctAnswer) {
         correct++;
+      } else if (q.alternativeAnswers) {
+        // Check alternative answers if they exist
+        const isCorrect = q.alternativeAnswers.some(alt => 
+          normalizeAnswer(alt) === userAnswer
+        );
+        if (isCorrect) correct++;
       }
     });
     return {
@@ -126,7 +143,10 @@ function QuizRound5() {
     if (Object.keys(lockedAnswers).length === questions.length) {
       setShowResults(true);
       localStorage.setItem('round5Answers', JSON.stringify(answers));
-      localStorage.setItem('round5Score', JSON.stringify(calculateScore()));
+      localStorage.setItem('round5Score', JSON.stringify({
+        ...calculateScore(),
+        hintsUsed
+      }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -135,13 +155,23 @@ function QuizRound5() {
     navigate('/results');
   };
 
+  const handleHint = (questionId) => {
+    if (hintsUsed < 3 && !showHint[questionId]) {
+      setShowHint(prev => ({ ...prev, [questionId]: true }));
+      setHintsUsed(prev => prev + 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-8 px-4 sm:py-12">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
             Round 5: Christmas Emoji Pictionary! 🎯
           </h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            You have 3 hints available for this round - use them wisely! 🎯
+          </p>
 
           <div className="space-y-6">
             {questions.map((question) => (
@@ -159,7 +189,7 @@ function QuizRound5() {
                       value={answers[question.id] || ''}
                       onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                       disabled={lockedAnswers[question.id] || showResults}
-                      placeholder="What's the Christmas phrase?"
+                      placeholder="What's the Christmas Film?"
                       className="flex-1 p-2 border rounded-lg"
                     />
                     <button
@@ -172,13 +202,19 @@ function QuizRound5() {
                     >
                       {lockedAnswers[question.id] ? <FaLock /> : <FaLockOpen />}
                     </button>
-                    <button
-                      onClick={() => toggleHint(question.id)}
-                      className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200
-                               transition-colors duration-300"
-                    >
-                      💡
-                    </button>
+                    {!showHint[question.id] && hintsUsed < 3 && !lockedAnswers[question.id] && (
+                      <button
+                        onClick={() => handleHint(question.id)}
+                        className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 
+                                   transition-colors duration-200 flex items-center gap-2"
+                        title={`Use Hint (${3 - hintsUsed} remaining)`}
+                      >
+                        <FaQuestionCircle className="text-lg" />
+                        <span className="hidden sm:inline">
+                          ({3 - hintsUsed})
+                        </span>
+                      </button>
+                    )}
                   </div>
                   {showHint[question.id] && (
                     <p className="text-blue-600 animate-fadeIn">
@@ -187,7 +223,11 @@ function QuizRound5() {
                   )}
                   {showResults && (
                     <p className={`font-semibold ${
-                      normalizeAnswer(answers[question.id]) === normalizeAnswer(question.answer)
+                      normalizeAnswer(answers[question.id]) === normalizeAnswer(question.answer) ||
+                      (question.alternativeAnswers && 
+                        question.alternativeAnswers.some(alt => 
+                          normalizeAnswer(alt) === normalizeAnswer(answers[question.id])
+                        ))
                         ? 'text-green-600'
                         : 'text-red-600'
                       } animate-fadeIn`}

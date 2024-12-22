@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaLock, FaLockOpen, FaQuestionCircle } from 'react-icons/fa';
 
 const questions = [
   {
@@ -90,6 +90,7 @@ function QuizRound4() {
   const [lockedAnswers, setLockedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showHint, setShowHint] = useState({});
+  const [hintsUsed, setHintsUsed] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -120,6 +121,13 @@ function QuizRound4() {
     }));
   };
 
+  const handleHint = (questionId) => {
+    if (hintsUsed < 3 && !showHint[questionId]) {
+      setShowHint(prev => ({ ...prev, [questionId]: true }));
+      setHintsUsed(prev => prev + 1);
+    }
+  };
+
   // Update calculateScore
   const calculateScore = () => {
     let correct = 0;
@@ -138,7 +146,10 @@ function QuizRound4() {
     if (Object.keys(lockedAnswers).length === questions.length) {
       setShowResults(true);
       localStorage.setItem('round4Answers', JSON.stringify(answers));
-      localStorage.setItem('round4Score', JSON.stringify(calculateScore()));
+      localStorage.setItem('round4Score', JSON.stringify({
+        ...calculateScore(),
+        hintsUsed
+      }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -151,9 +162,12 @@ function QuizRound4() {
     <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-8 px-4 sm:py-12">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
             Round 4: Christmas Song Lyrics! 🎵
           </h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            You have 3 hints available for this round - use them wisely! 🎯
+          </p>
 
           <div className="space-y-6">
             {questions.map((question) => (
@@ -186,13 +200,19 @@ function QuizRound4() {
                     >
                       {lockedAnswers[question.id] ? <FaLock /> : <FaLockOpen />}
                     </button>
-                    <button
-                      onClick={() => toggleHint(question.id)}
-                      className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200
-                               transition-colors duration-300"
-                    >
-                      💡
-                    </button>
+                    {!showHint[question.id] && hintsUsed < 3 && !lockedAnswers[question.id] && (
+                      <button
+                        onClick={() => handleHint(question.id)}
+                        className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 
+                                   transition-colors duration-200 flex items-center gap-2"
+                        title={`Use Hint (${3 - hintsUsed} remaining)`}
+                      >
+                        <FaQuestionCircle className="text-lg" />
+                        <span className="hidden sm:inline">
+                          ({3 - hintsUsed})
+                        </span>
+                      </button>
+                    )}
                   </div>
                   {showHint[question.id] && (
                     <p className="text-blue-600 animate-fadeIn">
@@ -250,7 +270,7 @@ function QuizRound4() {
                          hover:bg-green-700 transition-all duration-300 hover:scale-102
                          animate-bounce"
               >
-                See Final Results 🎄
+                Continue to Round 5 🎄
               </button>
             </div>
           )}

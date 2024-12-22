@@ -1,85 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const questions = [
-  {
-    id: 1,
-    question: "Which Christmas beverage is also known as 'Milk Punch'?",
-    options: ["Mulled Wine", "Eggnog", "Hot Chocolate", "Apple Cider"],
-    correct: "Eggnog"
-  },
-  {
-    id: 2,
-    question: "In Home Alone, where are the McCallisters flying to when they leave Kevin?",
-    options: ["London", "Paris", "New York", "Miami"],
-    correct: "Paris"
-  },
-  {
-    id: 3,
-    question: "What decoration is traditionally placed on top of a Christmas tree?",
-    options: ["Star", "Angel", "Santa", "Bell"],
-    correct: "Star"
-  },
-  {
-    id: 4,
-    question: "Which of Santa's reindeer shares its name with a famous symbol of Valentine's Day?",
-    options: ["Dasher", "Cupid", "Comet", "Blitzen"],
-    correct: "Cupid"
-  },
-  {
-    id: 5,
-    question: "In the song 'The Twelve Days of Christmas,' how many lords are leaping?",
-    options: ["Eight", "Nine", "Ten", "Eleven"],
-    correct: "Ten"
-  },
-  {
-    id: 6,
-    question: "What color are mistletoe berries?",
-    options: ["Red", "Green", "White", "Purple"],
-    correct: "White"
-  },
-  {
-    id: 7,
-    question: "Which country started the tradition of putting up Christmas trees?",
-    options: ["USA", "England", "Germany", "Norway"],
-    correct: "Germany"
-  },
-  {
-    id: 8,
-    question: "What was the first company that used Santa Claus in advertising?",
-    options: ["Pepsi", "Coca-Cola", "McDonald's", "Ford"],
-    correct: "Coca-Cola"
-  },
-  {
-    id: 9,
-    question: "In which modern-day country was Saint Nicholas born?",
-    options: ["Greece", "Turkey", "Italy", "Spain"],
-    correct: "Turkey"
-  },
-  {
-    id: 10,
-    question: "What Christmas-themed ballet premiered in St. Petersburg, Russia in 1892?",
-    options: ["The Nutcracker", "Swan Lake", "Sleeping Beauty", "The Snow Maiden"],
-    correct: "The Nutcracker"
-  }
-];
+import { FaLock, FaLockOpen, FaQuestionCircle } from 'react-icons/fa';
+import { round1Questions as originalQuestions } from '../data/questions';
 
 function QuizRound1() {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [lockedAnswers, setLockedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [showHint, setShowHint] = useState({});
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [questions, setQuestions] = useState([]);
 
-  const handleAnswer = (selectedOption) => {
-    setAnswers(prev => ({
-      ...prev,
-      [questions[currentQuestion].id]: selectedOption
-    }));
+  // Initialize randomized questions on mount
+  useEffect(() => {
+    const shuffledQuestions = originalQuestions.map(q => ({
+      ...q,
+      options: [...q.options].sort(() => Math.random() - 0.5)
+    })).sort(() => Math.random() - 0.5);
+    
+    setQuestions(shuffledQuestions);
+    window.scrollTo(0, 0);
+  }, []);
 
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    } else {
-      setShowResults(true);
+  const handleAnswer = (questionId, selectedOption) => {
+    if (!lockedAnswers[questionId]) {
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: selectedOption
+      }));
+    }
+  };
+
+  const toggleLock = (id) => {
+    if (!lockedAnswers[id] && answers[id]?.trim()) {
+      setLockedAnswers(prev => ({
+        ...prev,
+        [id]: true
+      }));
+    }
+  };
+
+  const handleHint = (questionId) => {
+    if (hintsUsed < 3 && !showHint[questionId]) {
+      setShowHint(prev => ({ ...prev, [questionId]: true }));
+      setHintsUsed(prev => prev + 1);
     }
   };
 
@@ -96,102 +61,144 @@ function QuizRound1() {
     };
   };
 
+  const handleSubmit = () => {
+    if (Object.keys(lockedAnswers).length === questions.length) {
+      setShowResults(true);
+      localStorage.setItem('round1Answers', JSON.stringify(answers));
+      localStorage.setItem('round1Score', JSON.stringify({
+        ...calculateScore(),
+        hintsUsed
+      }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleNext = () => {
-    localStorage.setItem('round1Answers', JSON.stringify(answers));
-    localStorage.setItem('round1Score', JSON.stringify(calculateScore()));
     navigate('/round2');
   };
 
-  const currentQ = questions[currentQuestion];
-
-  if (showResults) {
-    const score = calculateScore();
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">Round 1 Complete! 🎄</h2>
-            
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-green-100 p-6 rounded-lg text-center">
-                <p className="text-4xl font-bold text-green-600 mb-2">{score.correct}</p>
-                <p className="text-green-800">Correct</p>
-              </div>
-              <div className="bg-red-100 p-6 rounded-lg text-center">
-                <p className="text-4xl font-bold text-red-600 mb-2">{score.incorrect}</p>
-                <p className="text-red-800">Incorrect</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {questions.map((q) => (
-                <div key={q.id} className="border-b pb-4">
-                  <p className="font-semibold mb-2">{q.question}</p>
-                  <p className={`${answers[q.id] === q.correct ? 'text-green-600' : 'text-red-600'}`}>
-                    Your answer: {answers[q.id]}
-                    {answers[q.id] !== q.correct && (
-                      <span className="text-green-600 ml-2">
-                        (Correct: {q.correct})
-                      </span>
-                    )}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={handleNext}
-              className="w-full mt-8 bg-green-600 text-white py-3 rounded-lg font-semibold
-                       hover:bg-green-700 transition-colors duration-200"
-            >
-              Continue to Round 2 🎄
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-12">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-xl p-8">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Round 1</h2>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+    <div className="min-h-screen bg-gradient-to-b from-red-700 to-green-700 py-8 px-4 sm:py-12">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">
+            Round 1: Christmas Trivia! 🎄
+          </h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            You have 3 hints available for this round - use them wisely! 🎯
+          </p>
+
+          <div className="space-y-6">
+            {questions.map((question) => (
               <div 
-                className="bg-red-600 h-2.5 rounded-full transition-all duration-300"
-                style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-              ></div>
-            </div>
+                key={question.id}
+                className="bg-gray-50 p-4 rounded-lg transform transition-all duration-500"
+              >
+                <div className="flex flex-col gap-4">
+                  <p className="text-lg font-medium">{question.question}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 space-y-2">
+                      {question.options.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => handleAnswer(question.id, option)}
+                          disabled={lockedAnswers[question.id] || showResults}
+                          className={`w-full text-left p-4 rounded-lg transition-colors duration-200 
+                            ${answers[question.id] === option 
+                              ? 'bg-red-600 text-white' 
+                              : 'bg-gray-100 hover:bg-gray-200'}`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => toggleLock(question.id)}
+                        disabled={!answers[question.id] || showResults}
+                        className={`p-2 rounded-lg transition-colors duration-300 ${
+                          lockedAnswers[question.id] 
+                            ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {lockedAnswers[question.id] ? <FaLock /> : <FaLockOpen />}
+                      </button>
+                      {!showHint[question.id] && hintsUsed < 3 && !lockedAnswers[question.id] && (
+                        <button
+                          onClick={() => handleHint(question.id)}
+                          className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 
+                                   transition-colors duration-200 flex items-center gap-2"
+                          title={`Use Hint (${3 - hintsUsed} remaining)`}
+                        >
+                          <FaQuestionCircle className="text-lg" />
+                          <span className="hidden sm:inline">
+                            ({3 - hintsUsed})
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {showHint[question.id] && (
+                    <p className="text-blue-600 animate-fadeIn">
+                      💡 {question.hint}
+                    </p>
+                  )}
+                  {showResults && (
+                    <p className={`font-semibold ${
+                      answers[question.id] === question.correct
+                        ? 'text-green-600'
+                        : 'text-red-600'
+                    }`}>
+                      {answers[question.id] === question.correct 
+                        ? '✓ Correct!' 
+                        : `✗ Incorrect. The correct answer was: ${question.correct}`}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4">{currentQ.question}</h3>
-            <div className="space-y-3">
-              {currentQ.options.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleAnswer(option)}
-                  className={`w-full text-left p-4 rounded-lg transition-colors duration-200 
-                    ${answers[currentQ.id] === option 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200'}`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {currentQuestion === questions.length - 1 && Object.keys(answers).length === questions.length && (
+          {!showResults && (
             <button
-              onClick={handleNext}
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold
-                       hover:bg-green-700 transition-colors duration-200"
+              onClick={handleSubmit}
+              disabled={Object.keys(lockedAnswers).length !== questions.length}
+              className={`w-full mt-8 py-3 rounded-lg font-semibold transform transition-all duration-300
+                ${Object.keys(lockedAnswers).length === questions.length
+                  ? 'bg-green-600 hover:bg-green-700 text-white hover:scale-102'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+                animate-bounce`}
             >
-              Continue to Round 2 🎄
+              Submit Answers ({Object.keys(lockedAnswers).length}/10 Locked)
             </button>
+          )}
+
+          {showResults && (
+            <div className="animate-fadeIn">
+              <div className="grid grid-cols-2 gap-4 mt-8 mb-8">
+                <div className="bg-green-100 p-4 sm:p-6 rounded-lg text-center transform transition hover:scale-105">
+                  <p className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">
+                    {calculateScore().correct}
+                  </p>
+                  <p className="text-green-800">Correct</p>
+                </div>
+                <div className="bg-red-100 p-4 sm:p-6 rounded-lg text-center transform transition hover:scale-105">
+                  <p className="text-3xl sm:text-4xl font-bold text-red-600 mb-2">
+                    {calculateScore().incorrect}
+                  </p>
+                  <p className="text-red-800">Incorrect</p>
+                </div>
+              </div>
+              <button
+                onClick={handleNext}
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold
+                         hover:bg-green-700 transition-all duration-300 hover:scale-102
+                         animate-bounce"
+              >
+                Continue to Round 2 🎄
+              </button>
+            </div>
           )}
         </div>
       </div>

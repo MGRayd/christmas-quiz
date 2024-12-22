@@ -1,112 +1,90 @@
 export const round1Questions = [
   {
     id: 1,
-    question: "Which Christmas ballet is the most famous of all time?",
-    options: [
-      "Swan Lake",
-      "The Nutcracker",
-      "Sleeping Beauty",
-      "Cinderella"
-    ],
-    correctAnswer: "The Nutcracker"
+    question: "Which Christmas beverage is also known as 'Milk Punch'?",
+    options: ["Mulled Wine", "Eggnog", "Hot Chocolate", "Apple Cider"],
+    correct: "Eggnog",
+    hint: "This creamy drink is often served during holiday parties."
   },
   {
     id: 2,
     question: "In Home Alone, where are the McCallisters flying to when they leave Kevin?",
-    options: [
-      "London",
-      "Paris",
-      "New York",
-      "Rome"
-    ],
-    correctAnswer: "Paris"
+    options: ["London", "Paris", "New York", "Rome"],
+    correct: "Paris",
+    hint: "The family was planning to spend Christmas in a European capital."
   },
   {
     id: 3,
-    question: "What is traditionally hidden inside a Christmas pudding?",
-    options: [
-      "A coin",
-      "A button",
-      "A ring",
-      "A thimble"
-    ],
-    correctAnswer: "A coin"
+    question: "What decoration is traditionally placed on top of a Christmas tree?",
+    options: ["Star", "Angel", "Santa", "Bell"],
+    correct: "Star",
+    hint: "Look up at the night sky for inspiration."
   },
   {
     id: 4,
-    question: "Which country started the tradition of putting up a Christmas tree?",
-    options: [
-      "USA",
-      "England",
-      "Germany",
-      "Norway"
-    ],
-    correctAnswer: "Germany"
+    question: "Which of Santa's reindeer shares its name with a famous symbol of Valentine's Day?",
+    options: ["Dasher", "Cupid", "Comet", "Blitzen"],
+    correct: "Cupid",
+    hint: "Think about which reindeer is associated with love."
   },
   {
     id: 5,
-    question: "What did the other reindeer not let Rudolph do?",
-    options: [
-      "Join in any reindeer games",
-      "Eat with them",
-      "Sleep in the stable",
-      "Fly with them"
-    ],
-    correctAnswer: "Join in any reindeer games"
+    question: "In the song 'The Twelve Days of Christmas,' how many lords are leaping?",
+    options: ["Eight", "Nine", "Ten", "Eleven"],
+    correct: "Ten",
+    hint: "Count the days from the start of the song to this gift."
   },
   {
     id: 6,
-    question: "What is the name of the period leading up to Christmas?",
-    options: [
-      "Lent",
-      "Advent",
-      "Easter",
-      "Halloween"
-    ],
-    correctAnswer: "Advent"
+    question: "What color are mistletoe berries?",
+    options: ["Red", "Green", "White", "Purple"],
+    correct: "White",
+    hint: "These berries blend in with winter's color scheme."
   },
   {
     id: 7,
-    question: "What would you traditionally find on top of a Christmas tree?",
-    options: [
-      "An Angel",
-      "A Star",
-      "A Fairy",
-      "A Bell"
-    ],
-    correctAnswer: "An Angel"
+    question: "Which country started the tradition of putting up Christmas trees?",
+    options: ["USA", "England", "Germany", "Norway"],
+    correct: "Germany",
+    hint: "This European country is known for its Christmas markets."
   },
   {
     id: 8,
-    question: "In which modern-day country was Saint Nicholas born?",
-    options: [
-      "Turkey",
-      "Greece",
-      "Italy",
-      "Spain"
-    ],
-    correctAnswer: "Turkey"
+    question: "What was the first company that used Santa Claus in advertising?",
+    options: ["Pepsi", "Coca-Cola", "McDonald's", "Ford"],
+    correct: "Coca-Cola",
+    hint: "Think about Santa's red and white color scheme."
   },
   {
     id: 9,
-    question: "What is the best-selling Christmas single of all time?",
-    options: [
-      "Last Christmas",
-      "All I Want for Christmas Is You",
-      "White Christmas",
-      "Jingle Bells"
-    ],
-    correctAnswer: "White Christmas"
+    question: "In which modern-day country was Saint Nicholas born?",
+    options: ["Greece", "Turkey", "Italy", "Spain"],
+    correct: "Turkey",
+    hint: "This country connects Europe and Asia."
   },
   {
     id: 10,
-    question: "What Christmas decoration was originally made from strands of silver?",
-    options: [
-      "Tinsel",
-      "Baubles",
-      "Lights",
-      "Beads"
-    ],
-    correctAnswer: "Tinsel"
+    question: "What Christmas-themed ballet premiered in St. Petersburg, Russia in 1892?",
+    options: ["The Nutcracker", "Swan Lake", "Sleeping Beauty", "The Snow Maiden"],
+    correct: "The Nutcracker",
+    hint: "This ballet features toys coming to life on Christmas Eve."
   }
+]; 
+
+export const round2Questions = [
+  {
+    id: 1,
+    image: "/images/round2/1.jpg",
+    options: ["Gingerbread House", "Christmas Cottage", "Santa's Workshop", "Winter Cabin"],
+    correct: "Gingerbread House",
+    hint: "A sweet and edible festive construction"
+  },
+  {
+    id: 2,
+    image: "/images/round2/2.jpg",
+    options: ["Candy Cane", "Christmas Lollipop", "Peppermint Stick", "Festive Swirl"],
+    correct: "Candy Cane",
+    hint: "A striped hook-shaped Christmas treat"
+  },
+  // ... add hints for other questions
 ]; 

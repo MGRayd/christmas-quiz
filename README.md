@@ -26,3 +26,13 @@ Visit the quiz at: https://mgrayd.github.io/xmas-quiz/
 
 ## Local Development
 1. Clone the repository:
+
+```
+
+## Deployment
+
+To deploy to GitHub Pages:
+
+1. Make sure all changes are committed
+2. Run `npm run deploy`
+3. The site will be deployed to https://[your-github-username].github.io/christmas-quiz/
