@@ -26,7 +26,36 @@ Visit the quiz at: https://mgrayd.github.io/xmas-quiz/
 
 ## Local Development
 1. Clone the repository:
+```bash
+git clone https://github.com/[your-username]/christmas-quiz.git
+cd christmas-quiz
+```
 
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up Google Sheets:
+   - Create a new Google Sheet for score tracking
+   - Go to Google Cloud Console and create a new project
+   - Enable the Google Sheets API for your project
+   - Create credentials (Service Account) and download the JSON key file
+   - Share your Google Sheet with the service account email
+   - Copy the Google Sheet ID from the URL
+
+4. Configure environment variables:
+   - Create a `.env` file in the root directory
+   - Add the following variables:
+     ```
+     VITE_GOOGLE_SHEET_ID=your_sheet_id
+     VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL=your_service_account_email
+     VITE_GOOGLE_PRIVATE_KEY=your_private_key
+     ```
+
+5. Run the development server:
+```bash
+npm run dev
 ```
 
 ## Deployment
